@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-30">
+    <h1 class="border-bottom py-3">Book Details</h1>
+    <div class="card detail-card">
+        <div class="card-body border">
+            <h5 class="card-title">Title</h5>
+            <p class="card-text">{{ book.title }}</p>
+        </div>
+        <div class="card-body border">
+            <h5 class="card-title">Book Date</h5>
+            <p class="card-text">{{ book.book_date }}</p>
+        </div>
+    </div>
+    <div class="card detail-card mt-2">
+        <div class="card-body border">
+            <h5 class="card-title">Writer</h5>
+            <!--forign key 사용하는 법. 모델의 forignkey.columnname -->
+            <p class="card-text">{{ book.book_writer.book_writer }}</p>
+        </div>
+        <div class="card-body border">
+            <h5 class="card-title">Company</h5>
+            <p class="card-text">{{ book.company.company_name }}</p>
+        </div>
+    </div>
+    <div class="card detail-card mt-2">
+        <div class="card-body border">
+            <h5 class="card-title" style="display:inline-block">Reports</h5>
+            {% if report_list %}
+            <h6 style="display:inline-block">{{ report_list|length }}건</h6>
+            <ul>
+            {% for report in report_list %}
+            <!--파라미터 1개-->
+            <li class="card-text mt-1"><a href="{% url 'fivecart:report_detail' report_id=report.id %}">{{ report.user.user_name }}: {{ book.title }}</a></li>
+            {% endfor %}
+            </ul>
+            {% else %}
+            <p class="card-text">독서 리뷰 없음</p>
+            {% endif %}
+        </div>
+    </div>
+    <a class="a-block" href="{% url 'fivecart:index' %}"><button type="button" class="btn btn-outline-secondary btn-sm">목록으로</button></a>
+
+</div>
+{% endblock %}

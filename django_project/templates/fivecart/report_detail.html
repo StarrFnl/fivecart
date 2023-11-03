@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-30">
+    <div class="border-bottom pt-3 pb-2"
+         style="display:flex; flex-direction:row; justify-content:space-between; align-items:baseline">
+        <h1 class="">{{ report.user.user_name }}</h1>
+        <a class="a-block" href="{% url 'fivecart:detail' book_id=report.book_id %}">
+            <button type="button" class="btn btn-outline-secondary btn-sm">목록으로</button>
+        </a>
+    </div>
+
+    <div class="card detail-card my-2">
+        <div class="card-body border">
+            <h5 class="card-title">Title</h5>
+            <!--forign key 사용하는 법. 모델의 forignkey.columnname -->
+            <p class="card-text">{{ report.book.title }}</p>
+        </div>
+        <div class="card-body border">
+            <h5 class="card-title">Write Date</h5>
+            <p class="card-text">{{ report.report_date }}</p>
+        </div>
+    </div>
+    <div class="card detail-report py-3 px-3">
+        <h5 class="card-title">Report ID : <span id="report_id">{{ report.id }}</span></h5>
+        <p class="card-text" id="report_text">{{ report.report_text }}</p>
+        <!--        <form method="post" action="{% url 'fivecart:execute_keyfunc' %}">-->
+        <!--            {% csrf_token %}-->
+        <!--            <input type="hidden" name="param" value="{{ report.report_text }}">-->
+        <!--            <input type="submit" class="btn btn-primary mx-2" value="키워드 가져오기" onclick="letsKeyWord()">-->
+        <!--        </form>-->
+        <hr>
+        <p style="margin-bottom:0">추출할 키워드 n-gram의 수를 정하세요.(n-gram 크기가 커질수록 시간이 많이 소요됩니다.)</p>
+        <div class="radio_number" style="margin-bottom:5px; display:flex" >
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioNumber" id="radio_number_1" value=1 checked>
+                <label class="form-check-label" for="radio_number_1">
+                    1개
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioNumber" id="radio_number_2" value=2>
+                <label class="form-check-label" for="radio_number_2">
+                    2개
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioNumber" id="radio_number_3" value=3>
+                <label class="form-check-label" for="radio_number_2">
+                    3개
+                </label>
+            </div>
+        </div>
+        <hr>
+        <p style="margin-bottom:0">적용할 자연어 처리 모델을 선택하세요. (모델에 따라 긴 시간이 소요될 수 있습니다.)</p>
+        <div class="radio_group" style="margin-bottom:5px;">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio_default" value="default"
+                       checked>
+                <label class="form-check-label" for="radio_default">
+                    default(roberta-small)
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio_roberta-base"
+                       value="roberta-base">
+                <label class="form-check-label" for="radio_roberta-base">
+                    roberta-base
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio_roberta-large"
+                       value="roberta-large">
+                <label class="form-check-label" for="radio_roberta-large">
+                    roberta-large
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio_keybert-base"
+                       value="keybert-base">
+                <label class="form-check-label" for="radio_keybert-base">
+                    keybert-base
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio_bert-base"
+                       value="bert-base">
+                <label class="form-check-label" for="radio_bert-base">
+                    bert-base
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio_all-mpnet-base-v2"
+                       value="all-mpnet-base-v2">
+                <label class="form-check-label" for="radio_all-mpnet-base-v2">
+                    all-mpnet-base-v2
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault"
+                       id="radio_distiluse-base-multilingual-cased-v1" value="distiluse-base-multilingual-cased-v1">
+                <label class="form-check-label" for="radio_distiluse-base-multilingual-cased-v1">
+                    distiluse-base-multilingual-cased-v1
+                </label>
+            </div>
+        </div>
+        <hr>
+        <div class="check-group" style="margin-bottom:5px;">
+            <span>추출 결과 다양화를 위한 옵션을 선택하세요. (선택 없을 시 기본값 적용)</span>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="checkbox1" value="max-sum">
+                <label class="form-check-label" for="checkbox1">
+                    max-sum (추출 후보군 중 가장 서로 다른 키워드 추출)
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="checkbox2" value="mmr">
+                <label class="form-check-label" for="checkbox2">
+                    maximal marginal relevance (매 단계마다 추출한 키워드와 중복성이 낮은 키워드 추출)
+                </label>
+            </div>
+        </div>
+
+
+        <button type="button" id="keywordButton" class="btn btn-primary mx-2" onclick="letsKeyWord()">키워드 가져오기</button>
+    </div>
+    <div class="card detail-report my-1 py-2 px-3">
+        <h5 class="card-title">Keywords</h5>
+        <!--        <p class="card-text">{{ keywords }}</p>-->
+        <div style="display:flex;">
+            <p id="copy" class="card-text">
+                <!-- keyword 들어감 -->
+            </p>
+            <button type="button" class="btn btn-secondary mx-2" onclick="copyToClipboard()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-copy"
+                     viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                          d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2Zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6ZM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1H2Z"></path>
+                </svg>
+            </button>
+            <!--<button type="button" class="btn btn-outline-primary btn-sm" onclick="copyToClipboard()">Copy Keywords</button>-->
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="{% static 'external.js' %}"></script>
+<script>
+  function letsKeyWord() {
+  var button = document.querySelector('#keywordButton');
+  button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+
+  // Ajax 사용
+  var text = document.getElementById("report_text").textContent;
+  var radio_group = document.getElementsByName('flexRadioDefault');
+  var radio_number = document.getElementsByName('flexRadioNumber');
+  var radio_result = "default";
+  radio_group.forEach((node)=>{
+    if(node.checked){
+        radio_result = node.value;
+    }
+  })
+  var number_result = 1;
+  radio_number.forEach((node)=>{
+    if(node.checked){
+        number_result = node.value;
+    }
+  })
+
+
+  var keyword_type = '{{ report.keyword_type|escapejs }}';
+  var keywords = '{{ report.keywords|escapejs }}';
+  var diversity_option = document.querySelectorAll('.check-group .form-check-input');
+    var checkedOptions = [];
+    diversity_option.forEach((checkbox) => {
+        if (checkbox.checked) {
+            checkedOptions.push(checkbox.value);
+        }
+    });
+  radio_result+=(number_result+checkedOptions); //타입 + 개수 + 다양화옵션
+
+  //console.log(keyword_type);
+  //console.log(radio_result);
+  if(keyword_type == radio_result ){
+    if(keywords != null ){
+        var randomDelay = Math.floor(Math.random() * 1200) + 800;
+        setTimeout(function(){
+            document.getElementById("copy").textContent = keywords;
+            button.innerHTML = '키워드 가져오기';
+        }, randomDelay);
+        return;
+    }
+  }
+
+
+  var params = {
+    param1: text,
+    param2: radio_result,
+    param3: checkedOptions, //배열로 넘기기
+    param4: number_result
+  };
+
+  var jsonData = JSON.stringify(params);
+
+  fetch('{% url "fivecart:execute_keyfunc" %}', {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": "{{ csrf_token }}", // CSRF 토큰 추가
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: jsonData, // 전달할 값 설정
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // 결과를 가져와서 p 태그의 내용을 업데이트
+      var output = "";
+      for (var i = 0; i < data.keywords.length; i++) {
+        output += "(" + data.keywords[i] + ")";
+      }
+      document.getElementById("copy").textContent = output;
+      button.innerHTML = '키워드 가져오기';
+      update_keys(output, radio_result);
+      //document.getElementById('copy').textContent = data.keywords;
+      //document.getElementById('copy').textContent = data;
+    });
+}
+
+function update_keys(output, radio_result){
+    var report_id = document.getElementById("report_id").textContent;
+
+    var params = {
+        param1: output,
+        param2: radio_result,
+        param3: report_id
+    };
+
+    var jsonData = JSON.stringify(params);
+    fetch('{% url "fivecart:update_keys" %}', {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": "{{ csrf_token }}", // CSRF 토큰 추가
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: jsonData, // 전달할 값 설정
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data.message)
+      document.getElementById("copy").textContent = output;
+    })
+    .catch((error) => {
+        console.log("에러발생: "+error);
+    })
+}
+
+
+
+
+
+
+
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,43 @@
+
+table a {
+    text-decoration-line:none;
+}
+
+.detail-card {
+    display:flex;
+    flex-direction: row;
+}
+
+.card-body {
+    flex:1;
+}
+
+.detail-card ul {
+    list-style-type: none;
+}
+
+.detail-card ul li a{
+    text-decoration-line:none;
+}
+
+.a-block{
+    display:block;
+    text-align:right;
+    margin-top:5px;
+}
+
+
+.detail-report {
+    display:flex;
+    flex-direction: column;
+}
+
+.radio_group {
+    display: flex;
+}
+
+.form-check{
+ margin: 2px 5px;
+}
+
+
